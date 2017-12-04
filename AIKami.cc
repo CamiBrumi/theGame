@@ -43,47 +43,26 @@
    }
 
    // u != v
-   void cami(Pos u, set<Pos>& posicionsVisitades) {
-     set<pair<Pos, int>> dist; //pait vèrtex, distància de u
-     VE pare(n);
-     queue<Pos> cua;
-     cua.push(u);
-     pair 
-     dist = 0;
-     while (not cua.empty()) {
-       Pos x = cua.front(); cua.pop();
+   void trobaDireccioFactible(Pos posActual) {
+     set<Pos> posicionsVisitades;
+     queue<Pos> cuaPos;
+     cuaPos.push(posActual);
+     queue<Dir> cuaDir;
+     //cuaDir.push(Dir(NONE));
+     //TODO fa initializarea de la cele patru puncte cardinale
+     while (not cuaPos.empty()) {
+       Pos x = cuaPos.front(); cuaPos.pop();
+       Dir xDir = cuaDir.front(); cuaDir.pop();
        for (int d = 0; d < NONE; ++d) {
          Dir dir = Dir(d);
          Pos y = x + dir;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           cua.push(y);
-           dist[y] = dist[]
+           if (Cell(y).type == CITY or Cell(y).type == PATH) return xDir;
+           cuaPos.push(y);
+           cuaDir.push(xDir); // direcció cap a on ens haurem de moure
          }
        }
-
-
-       for (int y : G[x])
-         if (dist[y] == -1) {
-           cua.push(y);
-           dist[y] = dist[x] + 1;
-           pare[y] = x;
-           if (y == v) {
-             stack<int> pila;
-             while (y != u) {
-               pila.push(y);
-               y = pare[y];
-             }
-             cout << u;
-             while (not pila.empty()) {
-               cout << ' ' << pila.top();
-               pila.pop();
-             }
-             cout << endl;
-             return;
-           }
-         }
      }
-     cout << "no" << endl;
    }
 
    Pos trobaCasellaProfitable(set<Pos>& posicionsVisitades, Pos posActual, Dir& dirRetornada) {
