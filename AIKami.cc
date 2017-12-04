@@ -69,7 +69,7 @@
          Dir dir = Dir(d);
          Pos y = x + dir;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           if (cell(y).type == CITY or cell(y).type == PATH) return xDir;
+           if ((cell(y).type == CITY and city_owner(cell(y).city_id) != me()) or (cell(y).type == PATH and path_owner(cell(y).path_id) != me())) return xDir;
            posicionsVisitades.insert(y);
            cuaPos.push(y);
            cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
