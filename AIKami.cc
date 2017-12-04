@@ -48,31 +48,35 @@
      queue<Pos> cuaPos;
      cuaPos.push(posActual);
      queue<Dir> cuaDir;
+     posicionsVisitades.insert(posActual);
      //cuaDir.push(Dir(NONE));
      // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
      for (int d = 0; d < NONE; ++d) {
        Dir dir = Dir(d);
        Pos novaPos = posActual + dir;
+       posicionsVisitades.insert(novaPos);
 
        if (pos_ok(novaPos)) {
          cuaPos.push(novaPos);
          cuaDir.push(dir);
        }
      }
-
+     Dir xDir = Dir(NONE);
      while (not cuaPos.empty()) {
        Pos x = cuaPos.front(); cuaPos.pop();
-       Dir xDir = cuaDir.front(); cuaDir.pop();
+       xDir = cuaDir.front(); cuaDir.pop();
        for (int d = 0; d < NONE; ++d) {
          Dir dir = Dir(d);
          Pos y = x + dir;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           if (Cell(y).type == CITY or Cell(y).type == PATH) return xDir;
+           if (cell(y).type == CITY or cell(y).type == PATH) return xDir;
+           posicionsVisitades.insert(y);
            cuaPos.push(y);
            cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
          }
        }
      }
+     return xDir;
    }
 
    /*
