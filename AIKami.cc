@@ -43,13 +43,23 @@
    }
 
    // u != v
-   void trobaDireccioFactible(Pos posActual) {
+   Dir trobaDireccioFactible(Pos posActual) {
      set<Pos> posicionsVisitades;
      queue<Pos> cuaPos;
      cuaPos.push(posActual);
      queue<Dir> cuaDir;
      //cuaDir.push(Dir(NONE));
-     //TODO fa initializarea de la cele patru puncte cardinale
+     // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
+     for (int d = 0; d < NONE; ++d) {
+       Dir dir = Dir(d);
+       Pos novaPos = posActual + dir;
+
+       if (pos_ok(novaPos)) {
+         cuaPos.push(novaPos);
+         cuaDir.push(dir);
+       }
+     }
+
      while (not cuaPos.empty()) {
        Pos x = cuaPos.front(); cuaPos.pop();
        Dir xDir = cuaDir.front(); cuaDir.pop();
@@ -59,12 +69,13 @@
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
            if (Cell(y).type == CITY or Cell(y).type == PATH) return xDir;
            cuaPos.push(y);
-           cuaDir.push(xDir); // direcció cap a on ens haurem de moure
+           cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
          }
        }
      }
    }
 
+   /*
    Pos trobaCasellaProfitable(set<Pos>& posicionsVisitades, Pos posActual, Dir& dirRetornada) {
      Pos retPos;
      Cell tipusCasellaActual = Cell(posActual).type;
@@ -88,16 +99,14 @@
      }
      return retPos;
 
-   }
+   } */
 
    // Moves ork with identifier id.
    void move(int id) {
      set<Pos> posicionsVisitades;
      Unit u = unit(id);
      Pos posActual = u.pos;
-     Dir dirCasellaProf = NONE;
-     Pos posCasellaProf = trobaCasellaProfitable(posicionsVisitades, posActual, dirCasProf);
-     Dir dir = Dir(dirCasellaProf);
+     Dir dir = trobaDireccioFactible(posActual);
      Pos npos = posActual + dir;
      execute(Command(id, dir));
    }
@@ -109,9 +118,9 @@
       VI my_orks = orks(me()); // Get the id's of my orks.
 
       // Process orks in random order.
-      VI perm = random_permutation(my_orks.size());
-      for (int k = 0; k < int(perm.size()); ++k)
-        move(my_orks[perm[k]]);
+      //VI perm = random_permutation(my_orks.size());
+      for (int k = 0; k < int(my_orks.size()); ++k) // for (int k = 0; k < int(perm.size()); ++k)
+        move(my_orks[k]); //move(my_orks[perm[k]]);
     }
 
  };
