@@ -46,37 +46,44 @@
    Dir trobaDireccioFactible(Pos posActual) {
      set<Pos> posicionsVisitades;
      queue<Pos> cuaPos;
-     cuaPos.push(posActual);
-     queue<Dir> cuaDir;
+//     cuaPos.push(posActual);
+     queue<int> cuaDir;
      posicionsVisitades.insert(posActual);
      //cuaDir.push(Dir(NONE));
      // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
-     for (int d = 0; d < NONE; ++d) {
+     for (int d = 0; d < 4; ++d) {
        Dir dir = Dir(d);
        Pos novaPos = posActual + dir;
        posicionsVisitades.insert(novaPos);
 
        if (pos_ok(novaPos)) {
+         cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
          cuaPos.push(novaPos);
-         cuaDir.push(dir);
+         cuaDir.push(d);
        }
      }
-     Dir xDir = Dir(NONE);
+     int xDir = NONE;
      while (not cuaPos.empty()) {
        Pos x = cuaPos.front(); cuaPos.pop();
        xDir = cuaDir.front(); cuaDir.pop();
-       for (int d = 0; d < NONE; ++d) {
+       cout << "Dir poped is " << xDir << endl;
+       if ((cell(x).type == CITY and city_owner(cell(x).city_id) != me()) or (cell(x).type == PATH and path_owner(cell(x).path_id) != me())) {
+         cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
+          return Dir(xDir);
+       }
+       for (int d = 0; d < 4; ++d) {
          Dir dir = Dir(d);
          Pos y = x + dir;
+         cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           if ((cell(y).type == CITY and city_owner(cell(y).city_id) != me()) or (cell(y).type == PATH and path_owner(cell(y).path_id) != me())) return xDir;
+           cout << "Ork contemplates position (" << y.i << ", " <<  y.j << ") " << " and plans it in the direction " << xDir << std::endl;
            posicionsVisitades.insert(y);
            cuaPos.push(y);
            cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
          }
        }
      }
-     return xDir;
+     return Dir(xDir);
    }
 
    /*
@@ -110,8 +117,9 @@
      set<Pos> posicionsVisitades;
      Unit u = unit(id);
      Pos posActual = u.pos;
+     cout << "Debugging ork " << id << " which stands in position " << posActual << endl;
      Dir dir = trobaDireccioFactible(posActual);
-     Pos npos = posActual + dir;
+     //Pos npos = posActual + dir;
      execute(Command(id, dir));
    }
 
