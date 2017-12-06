@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Kami
+#define PLAYER_NAME Kami2
 
 
 /**
@@ -28,11 +28,15 @@
 
    typedef vector<int> VI;
    typedef vector<VI>  VVI;
+   typedef vector<VVI> VVVI; //vector de matrius
+   typedef pair<int, Pos> P;
 
    // Stores the location of orks.
    VVI ork_at;
-   const int INF = 1e9;
-   VVI distCP;
+   const int INF = 1e8;
+   VVVI cities, paths;
+   VVI path0; //TODO delete this after used
+
 
    //
 
@@ -43,7 +47,7 @@
          return false;
      return true;
    }
-
+   /*
    // u != v
    Dir trobaDireccioFactible(Pos posActual) {
      set<Pos> posicionsVisitades;
@@ -53,7 +57,7 @@
      posicionsVisitades.insert(posActual);
      //cuaDir.push(Dir(NONE));
      // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
-     for (int d = 0; d < NONE; ++d) {
+     for (int d = 1; d < DIR_SIZE; ++d) {
        Dir dir = Dir(d);
        Pos novaPos = posActual + dir;
        posicionsVisitades.insert(novaPos);
@@ -67,7 +71,7 @@
      while (not cuaPos.empty()) {
        Pos x = cuaPos.front(); cuaPos.pop();
        xDir = cuaDir.front(); cuaDir.pop();
-       for (int d = 0; d < NONE; ++d) {
+       for (int d = 1; d < DIR_SIZE; ++d) {
          Dir dir = Dir(d);
          Pos y = x + dir;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
@@ -80,32 +84,6 @@
      }
      return xDir;
    }
-
-   /*
-   Pos trobaCasellaProfitable(set<Pos>& posicionsVisitades, Pos posActual, Dir& dirRetornada) {
-     Pos retPos;
-     Cell tipusCasellaActual = Cell(posActual).type;
-     if ((tipusCasellaActual == CITY or tipusCelaActual == PATH) and unit(Cell(posActual).unit_id).player != me()) retPos = posActual;
-     else if (tipusCasellaActual == WATER or !pos_ok(posActual) or posicionsVisitades.find(posActual) != posicionsVisitades.end()) {
-       retPos = Pos(-1, -1); // si es una posicio visitada, no tenim que anar cap a ella (ens bloquejariem en un bucle infinit). en canvi, si l'iterador és == .end del set => no hem visitat aquesta posicio
-       posicionsVisitades.insert(posActual);
-     }
-     else {
-       posicionsVisitades.insert(posActual);
-       bool pos_trobada = false;
-       for (int d = 0; d != DIR_SIZE and !pos_trobada; ++d) {
-         Dir dir = Dir(d);
-         Pos npos = posActual + dir;
-         posicionsVisitades.insert(npos);
-         Dir dummyDir;
-         retPos = trobaCasellaProfitable(posicionsVisitades, npos, dummyDir);
-         dirRetornada = dir;
-         if (pos_ok(retPos)) pos_trobada = true;
-       }
-     }
-     return retPos;
-
-   } */
 
    // Moves ork with identifier id.
    void move(int id) {
@@ -143,14 +121,73 @@
        }
      }
      for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
-   }
+   } */
 
+   void dijkstra(Pos ini) {
+     cout << "HELLOU" << endl;
+     priority_queue<P> Q;
+     //VE dist(n, INF);
+     Q.push(P(0, ini));
+     //dist[ini] = 0;
+     while (not Q.empty()) {
+       cout << "ESTEM DINS DE LA CUETA" << endl;
+       P a = Q.top(); Q.pop();
+       int d = -a.first;
+       Pos x = a.second;
+       if (d == path0[x.i][x.j]) {
+         cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
+         for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
+           cout << "direcció: " << dir << endl;
+           Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
+           if (pos_ok(y) and cell(y).type != WATER) {
+             int c = cost (cell(y).type); //cost de la nova posició
+             int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
+             cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
+             if (d2 < path0[y.i][y.j]) {
+               cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
+               path0[y.i][y.j] = d2;
+               Q.push(P(-d2, y));
+             }
+           }
+         }
+       }
+     }
+     //for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
+   }
    /**
     * Play method, invoked once per each round.
     */
     virtual void play () {
       VI my_orks = orks(me()); // Get the id's of my orks.
       if (round() == 0) {
+
+        //omplim el el vector de Paths
+        int i0, j0;
+        path0 = VVI(rows(), VI(cols(), INF));
+        for (int i = 0; i < rows(); ++i) {
+          for (int j = 0; j < cols(); ++j) {
+            if (cell(i, j).path_id == 0) {
+              i0 = i;
+              j0 = j;
+              path0[i][j] = 0;
+            }
+            //cout << " " << path0[i][j];
+          }
+          //cout << endl;
+        }
+        Pos p;
+        p.i = i0;
+        p.j = j0;
+        dijkstra(p);
+        for (int i = 0; i < rows(); ++i) {
+          for (int j = 0; j < cols(); ++j) {
+            if (path0[i][j] != 0) cout <<  " $";
+            else cout << " " << path0[i][j];
+          }
+          cout << endl;
+        }
+
+        /*
         distCP = VVI(rows(), VI(cols()), INF);
         for(int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
@@ -166,7 +203,9 @@
       //VI perm = random_permutation(my_orks.size());
       for (int k = 0; k < int(my_orks.size()); ++k) // for (int k = 0; k < int(perm.size()); ++k)
         move(my_orks[k]); //move(my_orks[perm[k]]);
+        */
     }
+  }
 
  };
 

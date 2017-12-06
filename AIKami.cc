@@ -57,7 +57,7 @@
        posicionsVisitades.insert(novaPos);
 
        if (pos_ok(novaPos)) {
-         cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
+         //cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
          cuaPos.push(novaPos);
          cuaDir.push(d);
        }
@@ -66,17 +66,17 @@
      while (not cuaPos.empty()) {
        Pos x = cuaPos.front(); cuaPos.pop();
        xDir = cuaDir.front(); cuaDir.pop();
-       cout << "Dir poped is " << xDir << endl;
+       //cout << "Dir poped is " << xDir << endl;
        if ((cell(x).type == CITY and city_owner(cell(x).city_id) != me()) or (cell(x).type == PATH and path_owner(cell(x).path_id) != me())) {
-         cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
+         //cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
           return Dir(xDir);
        }
        for (int d = 0; d < 4; ++d) {
          Dir dir = Dir(d);
          Pos y = x + dir;
-         cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
+         //cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
          if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           cout << "Ork contemplates position (" << y.i << ", " <<  y.j << ") " << " and plans it in the direction " << xDir << std::endl;
+           //cout << "Ork contemplates position (" << y.i << ", " <<  y.j << ") " << " and plans it in the direction " << xDir << std::endl;
            posicionsVisitades.insert(y);
            cuaPos.push(y);
            cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
@@ -117,7 +117,7 @@
      set<Pos> posicionsVisitades;
      Unit u = unit(id);
      Pos posActual = u.pos;
-     cout << "Debugging ork " << id << " which stands in position " << posActual << endl;
+     //cout << "Debugging ork " << id << " which stands in position " << posActual << endl;
      Dir dir = trobaDireccioFactible(posActual);
      //Pos npos = posActual + dir;
      execute(Command(id, dir));
