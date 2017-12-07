@@ -91,15 +91,7 @@
      return xDir;
    }
 
-   // Moves ork with identifier id.
-   void move(int id) {
-     set<Pos> posicionsVisitades;
-     Unit u = unit(id);
-     Pos posActual = u.pos;
-     Dir dir = trobaDireccioFactible(posActual);
-     Pos npos = posActual + dir;
-     execute(Command(id, dir));
-   }
+
 
    void dijkstra() {
      priority_queue<pair<int, Pos>> Q;
@@ -128,6 +120,16 @@
      }
      for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
    } */
+
+   // Moves ork with identifier id.
+   void move(int id) {
+     Unit u = unit(id);
+     Pos posActual = u.pos;
+     Dir dir = Dir(path0[posActual.i][posActual.j].second);
+     Pos npos = posActual + dir;
+     execute(Command(id, dir));
+     cout << dir_str[dir] << endl;
+   }
 
    void dijkstra(Pos ini) {
      cout << "HELLOU" << endl;
@@ -165,10 +167,9 @@
     * Play method, invoked once per each round.
     */
     virtual void play () {
-      VI my_orks = orks(me()); // Get the id's of my orks.
       if (round() == 0) {
 
-        //omplim el el vector de Paths
+        //TODO quan troba una cela de la ciutat o del cami que es parin els for loops
         int i0, j0;
         path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
         for (int i = 0; i < rows(); ++i) {
@@ -195,24 +196,12 @@
           }
           cout << endl;
         }
+    }
+    VI my_orks = orks(me()); // Get the id's of my orks.
 
-        /*
-        distCP = VVI(rows(), VI(cols()), INF);
-        for(int i = 0; i < rows(); ++i) {
-          for (int j = 0; j < cols(); ++j) {
-            if (cell(i, j).type == CITY or cell(i, j).type == PATH) distCP[i][j] = 0;
-          }
-        }
-        //cuaprioritats<pair(int cost , Pos pos)> cost del tipus de terra
-
-
-
-      }
-      // Process orks in random order.
-      //VI perm = random_permutation(my_orks.size());
-      for (int k = 0; k < int(my_orks.size()); ++k) // for (int k = 0; k < int(perm.size()); ++k)
-        move(my_orks[k]); //move(my_orks[perm[k]]);
-        */
+    for (int k = 0; k < int(my_orks.size()); ++k) {
+      cout << "ORK " << k << " IS MOVING IN DIRECTION: ";
+      move(my_orks[k]);
     }
   }
 
