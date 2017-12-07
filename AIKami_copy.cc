@@ -35,7 +35,13 @@
    VVI ork_at;
    const int INF = 1e8;
    VVVI cities, paths;
-   VVI path0; //TODO delete this after used
+
+   typedef pair<int, int> PII;
+   typedef vector<PII> VP;
+   typedef vector<VP>  VVP;
+   VVP path0; //TODO delete this after used
+   const int dir_contraria [4] = { 2, 3, 0, 1 };
+   const char dir_str [4] = { 'B', 'R', 'T', 'L' };
 
 
    //
@@ -130,23 +136,24 @@
      Q.push(P(0, ini));
      //dist[ini] = 0;
      while (not Q.empty()) {
-       cout << "ESTEM DINS DE LA CUETA" << endl;
+       //cout << "ESTEM DINS DE LA CUETA" << endl;
        P a = Q.top(); Q.pop();
        int d = -a.first;
        Pos x = a.second;
-       if (d == path0[x.i][x.j]) {
-         cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
+       if (d == path0[x.i][x.j].first) {
+         //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
-           cout << "direcció: " << dir << endl;
+           //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
              int c = cost (cell(y).type); //cost de la nova posició
              int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
-             cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
-             if (d2 < path0[y.i][y.j]) {
-               cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
-               path0[y.i][y.j] = d2;
+             //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
+             if (d2 < path0[y.i][y.j].first) {
+               //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
+               path0[y.i][y.j].first = d2;
                Q.push(P(-d2, y));
+               path0[x.i][x.j].second = dir_contraria[dir];
              }
            }
          }
@@ -163,7 +170,7 @@
 
         //omplim el el vector de Paths
         int i0, j0;
-        path0 = VVI(rows(), VI(cols(), INF));
+        path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
         for (int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
             if (cell(i, j).path_id == 0) {
@@ -174,14 +181,14 @@
           }
           //cout << endl;
         }
-        path0[i0][j0] = 0;
+        path0[i0][j0].first = 0;
         Pos p;
         p.i = i0;
         p.j = j0;
         dijkstra(p);
         for (int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
-            if (path0[i][j] < 10) cout << " " << path0[i][j];
+            if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
             else cout << " -";
           }
           cout << endl;
