@@ -169,20 +169,20 @@
             if (cell(i, j).path_id == 0) {
               i0 = i;
               j0 = j;
-              path0[i][j] = 0;
             }
             //cout << " " << path0[i][j];
           }
           //cout << endl;
         }
+        path0[i0][j0] = 0;
         Pos p;
         p.i = i0;
         p.j = j0;
         dijkstra(p);
         for (int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
-            if (path0[i][j] != 0) cout <<  " $";
-            else cout << " " << path0[i][j];
+            if (path0[i][j] < 10) cout << " " << path0[i][j];
+            else cout << " -";
           }
           cout << endl;
         }
