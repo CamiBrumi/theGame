@@ -153,7 +153,7 @@
                //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
                path0[y.i][y.j].first = d2;
                Q.push(P(-d2, y));
-               path0[x.i][x.j].second = dir_contraria[dir];
+               path0[y.i][y.j].second = dir_contraria[dir];
              }
            }
          }
@@ -186,6 +186,8 @@
         p.i = i0;
         p.j = j0;
         dijkstra(p);
+
+
         for (int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
             if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
