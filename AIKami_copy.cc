@@ -34,7 +34,6 @@
    // Stores the location of orks.
    VVI ork_at;
    const int INF = 1e8;
-   VVVI cities, paths;
 
    typedef pair<int, int> PII;
    typedef vector<PII> VP;
@@ -59,7 +58,7 @@
      Unit u = unit(id);
      Pos posActual = u.pos;
      Dir dir = Dir(path0[posActual.i][posActual.j].second);
-     Pos npos = posActual + dir;
+     //Pos npos = posActual + dir;
      execute(Command(id, dir));
      cout << dir_str[dir] << endl;
    }
@@ -141,7 +140,7 @@
           bool found = false;
           int i0, j0;
           //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
-          for (int i = 0; i < rows(); ++i) {
+          for (int i = 0; i < rows() and not found; ++i) {
             for (int j = 0; j < cols() and not found; ++j) {
               if (cell(i, j).city_id == k) {
                 i0 = i;
@@ -158,10 +157,12 @@
           p.j = j0;
           dijkstraC(p, k); //TODO param wether is a city or a path
 
+        }
+        for (int k = 0; k < nb_paths(); ++k) {
           bool found = false;
           int i0, j0;
           //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
-          for (int i = 0; i < rows(); ++i) {
+          for (int i = 0; i < rows() and not found; ++i) {
             for (int j = 0; j < cols() and not found; ++j) {
               if (cell(i, j).path_id == k) {
                 i0 = i;
@@ -173,7 +174,7 @@
 
           }
           paths[k][i0][j0].first = 0;
-          //Pos p;
+          Pos p;
           p.i = i0;
           p.j = j0;
           dijkstraP(p, k); //TODO param wether is a city or a path
