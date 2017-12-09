@@ -1,10 +1,10 @@
 # To play with the Dummy, uncomment the line for your platform:
-#DUMMY_OBJ = AIDummy.o.Linux64
+DUMMY_OBJ = AIDummy.o.Linux64
 #DUMMY_OBJ = AIDummy.o.Linux32
 #DUMMY_OBJ = AIDummy.o.Win64.Cygwin
 #DUMMY_OBJ = AIDummy.o.Win64.MinGW
 #DUMMY_OBJ = AIDummy.o.Win32.MinGW
-DUMMY_OBJ = AIDummy.o.macOS
+#DUMMY_OBJ = AIDummy.o.macOS
 
 # Add here any extra .o player files you want to link to the executable
 EXTRA_OBJ =
@@ -40,20 +40,20 @@ LDFLAGS  = -std=c++11                            $(PROFILEFLAGS) $(DEBUGFLAGS) -
 
 # Rules
 
-OBJ = Structs.o Settings.o State.o Info.o Random.o Board.o Action.o Player.o Registry.o Utils.o 
+OBJ = Structs.o Settings.o State.o Info.o Random.o Board.o Action.o Player.o Registry.o Utils.o
 
 all: Game
 
 clean:
 	rm -rf Game  *.o *.exe Makefile.deps
 
-Game:  $(OBJ) Game.o Main.o $(PLAYERS_OBJ) 
+Game:  $(OBJ) Game.o Main.o $(PLAYERS_OBJ)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 SecGame: $(OBJ) SecGame.o SecMain.o
 	$(CXX) $^ -o $@ $(LDFLAGS) -lrt
 
-%.exe: %.o $(OBJ) SecGame.o SecMain.o 
+%.exe: %.o $(OBJ) SecGame.o SecMain.o
 	$(CXX) $^ -o $@ $(LDFLAGS) -lrt
 
 Makefile.deps: *.cc

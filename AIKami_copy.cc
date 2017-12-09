@@ -40,11 +40,11 @@
    typedef vector<PII> VP;
    typedef vector<VP>  VVP;
    VVP path0; //TODO delete this after used
+   typedef vector<VVP> VVVP; //vector de matrius de pairs.
+   VVVP cities, paths;
+
    const int dir_contraria [4] = { 2, 3, 0, 1 };
    const char dir_str [4] = { 'B', 'R', 'T', 'L' };
-
-
-   //
 
    // Returns true if winning.
    bool winning() {
@@ -53,73 +53,6 @@
          return false;
      return true;
    }
-   /*
-   // u != v
-   Dir trobaDireccioFactible(Pos posActual) {
-     set<Pos> posicionsVisitades;
-     queue<Pos> cuaPos;
-     cuaPos.push(posActual);
-     queue<Dir> cuaDir;
-     posicionsVisitades.insert(posActual);
-     //cuaDir.push(Dir(NONE));
-     // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
-     for (int d = 1; d < DIR_SIZE; ++d) {
-       Dir dir = Dir(d);
-       Pos novaPos = posActual + dir;
-       posicionsVisitades.insert(novaPos);
-
-       if (pos_ok(novaPos)) {
-         cuaPos.push(novaPos);
-         cuaDir.push(dir);
-       }
-     }
-     Dir xDir = Dir(NONE);
-     while (not cuaPos.empty()) {
-       Pos x = cuaPos.front(); cuaPos.pop();
-       xDir = cuaDir.front(); cuaDir.pop();
-       for (int d = 1; d < DIR_SIZE; ++d) {
-         Dir dir = Dir(d);
-         Pos y = x + dir;
-         if (pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) { //no hem visitat aquesta casella
-           if ((cell(y).type == CITY and city_owner(cell(y).city_id) != me()) or (cell(y).type == PATH and path_owner(cell(y).path_id) != me())) return xDir;
-           posicionsVisitades.insert(y);
-           cuaPos.push(y);
-           cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
-         }
-       }
-     }
-     return xDir;
-   }
-
-
-
-   void dijkstra() {
-     priority_queue<pair<int, Pos>> Q;
-     //VE dist(n, INF);
-     distCP = VVI(rows(), VI(cols()), INF);
-     //afegeixo zeros a ciut i paths
-     //Q.push(pair(0, ini)); //pair (cost, posicio) des de dintre del for
-     //dist[ini.i][ini.j] = 0;
-     while (not Q.empty()) {
-       pair<int, Pos> a = Q.top(); Q.pop();
-       int d = -a.first; // perque normalment surt el maxim, per aixo ens sortira el minim
-       Pos x = a.second;
-       if (d == dist[x.i][x.j]) {
-         for (int direc = 0; direc < NONE; direc++) {
-         //for (P arc : G[x]) {
-
-           int c = arc.first;
-           int y = arc.second;
-           int d2 = d + c;
-           if (d2 < dist[y]) {
-             dist[y] = d2;
-             Q.push(P(-d2, y));
-           }
-         }
-       }
-     }
-     for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
-   } */
 
    // Moves ork with identifier id.
    void move(int id) {
@@ -131,8 +64,8 @@
      cout << dir_str[dir] << endl;
    }
 
-   void dijkstra(Pos ini) {
-     cout << "HELLOU" << endl;
+   void dijkstraC(Pos ini, int k) {
+     //cout << "HELLOU" << endl;
      priority_queue<P> Q;
      //VE dist(n, INF);
      Q.push(P(0, ini));
@@ -142,7 +75,7 @@
        P a = Q.top(); Q.pop();
        int d = -a.first;
        Pos x = a.second;
-       if (d == path0[x.i][x.j].first) {
+       if (d == cities[k][x.i][x.j].first) {
          //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
            //cout << "direcció: " << dir << endl;
@@ -151,11 +84,44 @@
              int c = cost (cell(y).type); //cost de la nova posició
              int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
-             if (d2 < path0[y.i][y.j].first) {
+             if (d2 < cities[k][y.i][y.j].first) {
                //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
-               path0[y.i][y.j].first = d2;
+               cities[k][y.i][y.j].first = d2;
                Q.push(P(-d2, y));
-               path0[y.i][y.j].second = dir_contraria[dir];
+               cities[k][y.i][y.j].second = dir_contraria[dir];
+             }
+           }
+         }
+       }
+     }
+     //for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
+   }
+
+   void dijkstraP(Pos ini, int k) {
+     //cout << "HELLOU" << endl;
+     priority_queue<P> Q;
+     //VE dist(n, INF);
+     Q.push(P(0, ini));
+     //dist[ini] = 0;
+     while (not Q.empty()) {
+       //cout << "ESTEM DINS DE LA CUETA" << endl;
+       P a = Q.top(); Q.pop();
+       int d = -a.first;
+       Pos x = a.second;
+       if (d == paths[k][x.i][x.j].first) {
+         //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
+         for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
+           //cout << "direcció: " << dir << endl;
+           Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
+           if (pos_ok(y) and cell(y).type != WATER) {
+             int c = cost (cell(y).type); //cost de la nova posició
+             int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
+             //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
+             if (d2 < paths[k][x.i][x.j].first) {
+               //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
+               paths[k][x.i][x.j].first = d2;
+               Q.push(P(-d2, y));
+               paths[k][x.i][x.j].second = dir_contraria[dir];
              }
            }
          }
@@ -168,26 +134,50 @@
     */
     virtual void play () {
       if (round() == 0) {
+        cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1))));
+        paths = VVVP(nb_paths(), VVP(rows(), VP(cols(), PII(INF, -1))));
 
-        //TODO quan troba una cela de la ciutat o del cami que es parin els for loops
-        int i0, j0;
-        path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
-        for (int i = 0; i < rows(); ++i) {
-          for (int j = 0; j < cols(); ++j) {
-            if (cell(i, j).path_id == 0) {
-              i0 = i;
-              j0 = j;
+        for (int k = 0; k < nb_cities(); ++k) {
+          bool found = false;
+          int i0, j0;
+          //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
+          for (int i = 0; i < rows(); ++i) {
+            for (int j = 0; j < cols() and not found; ++j) {
+              if (cell(i, j).city_id == k) {
+                i0 = i;
+                j0 = j;
+                found = true;
+              }
+
             }
-            //cout << " " << path0[i][j];
-          }
-          //cout << endl;
-        }
-        path0[i0][j0].first = 0;
-        Pos p;
-        p.i = i0;
-        p.j = j0;
-        dijkstra(p);
 
+          }
+          cities[k][i0][j0].first = 0;
+          Pos p;
+          p.i = i0;
+          p.j = j0;
+          dijkstraC(p, k); //TODO param wether is a city or a path
+
+          bool found = false;
+          int i0, j0;
+          //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
+          for (int i = 0; i < rows(); ++i) {
+            for (int j = 0; j < cols() and not found; ++j) {
+              if (cell(i, j).path_id == k) {
+                i0 = i;
+                j0 = j;
+                found = true;
+              }
+
+            }
+
+          }
+          paths[k][i0][j0].first = 0;
+          //Pos p;
+          p.i = i0;
+          p.j = j0;
+          dijkstraP(p, k); //TODO param wether is a city or a path
+        }
 
         for (int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
