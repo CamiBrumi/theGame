@@ -88,6 +88,7 @@
    //if profitableIsCity is false, then it means that the paths VVVP must be used
    //selectedProfitableObject is the index of the city or path to be used
    void move(int id, int selectedProfitableObject, bool profitableIsCity) {
+
      Unit u = unit(id);
      Pos posActual = u.pos;
      Dir dir;
@@ -98,6 +99,7 @@
      //Pos npos = posActual + dir;
      execute(Command(id, dir));
      //cout << dir_str[dir] << endl;
+
    }
 
    void dijkstraC(Pos ini, int k) {
@@ -220,6 +222,7 @@
     VI my_orks = orks(me()); // Get the id's of my orks.
 
     for (int k = 0; k < int(my_orks.size()); ++k) {
+
       int selectedProfitableObject;
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
