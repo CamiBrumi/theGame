@@ -176,6 +176,62 @@
      }
      //for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
    }
+
+   //primul if
+//daca orcul din pos x ii al meu?
+//id != -1 and ii un orc strain
+//al doilea if:
+  //avansez daca pos ii ok si nu ii positia la care ma uit, AND (daca ii path OR city)
+   // u != v
+   bool findEnemyInNearbyCell(Pos posActual) {
+     set<Pos> posicionsVisitades;
+     queue<Pos> cuaPos;
+//     cuaPos.push(posActual);
+     queue<int> cuaDir;
+     posicionsVisitades.insert(posActual);
+     //cuaDir.push(Dir(NONE));
+     // posem les quatre direccions a partir del vèrtex actual a la cua. no ho podem fer al while perquè necessitem tindre en compte la direcció cap a on ens movem inicialment
+     for (int d = 0; d < 4; ++d) {
+       Dir dir = Dir(d);
+       Pos novaPos = posActual + dir;
+       posicionsVisitades.insert(novaPos);
+
+       if (pos_ok(novaPos)) {
+         //cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
+         cuaPos.push(novaPos);
+         cuaDir.push(d);
+       }
+     }
+     int xDir = NONE;
+     while (not cuaPos.empty()) {
+       Pos x = cuaPos.front(); cuaPos.pop();
+       xDir = cuaDir.front(); cuaDir.pop();
+       //cout << "Dir poped is " << xDir << endl;
+       if (cell(x).unit_id != -1 and unit(cell(x).unit_id).player != me()) {
+         //cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
+          if (unit(cell(x).unit_id).health < unit(cell(posActual).unit_id).health) {
+            execute(Command(cell(posActual).unit_id, Dir(xDir)));
+          } else {
+            execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
+          }
+          return true;
+       }
+       for (int d = 0; d < 4; ++d) {
+         Dir dir = Dir(d);
+         Pos y = x + dir;
+         //cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
+         if ((pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) and (cell(x).type == CITY or cell(x).type == PATH)) { //no hem visitat aquesta casella
+           //cout << "Ork contemplates position (" << y.i << ", " <<  y.j << ") " << " and plans it in the direction " << xDir << std::endl;
+           posicionsVisitades.insert(y);
+           cuaPos.push(y);
+           cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
+         }
+       }
+     }
+     return false;
+   }
+
+
    /**
     * Play method, invoked once per each round.
     */
@@ -233,19 +289,22 @@
       int selectedProfitableObject;
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
-      
-      int ork_i = unit(my_orks[k]).pos.first;
-      int ork_j = unit(my_orks[k]).pos.second;
 
-      bool attackedOrDefended = false;
-      if (Cell(ork_i, ork_j).type == CITY or Cell(ork_i, ork_j).type == PATH) {
+      int ork_i = unit(my_orks[k]).pos.i;
+      int ork_j = unit(my_orks[k]).pos.j;
+      Pos p;
+      p.i = ork_i;
+      p.j = ork_j;
+
+      bool threatened = false;
+      if (cell(ork_i, ork_j).type == CITY or cell(ork_i, ork_j).type == PATH) {
          const int radius = 5;
-         findEnemyInNearbyCell(cell)
+         findEnemyInNearbyCell(p); // inauntru punem radius si miscam jucatorul inspre enemic
       }
-       
+
       //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
       //cout << "selectedProfitableObject = " << selectedProfitableObject << endl;
-      if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
+      if (selectedProfitableObject != -1 and not threatened) //it might happen that you have simply conquered all
          move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
     }
   }
