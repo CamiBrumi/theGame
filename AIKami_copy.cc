@@ -63,13 +63,13 @@
       Pos posActual = u.pos;
       int i0 = posActual.i;
       int j0 = posActual.j;
-      for (int cityIdx = 0; cityIdx < 0; ++cityIdx) { //TODO nb_cities()
+      for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) { //TODO nb_cities()
          if (lowestCityCost > cities[cityIdx][i0][j0].first and city_owner(cityIdx) != me()) {
             lowestCityCost = cities[cityIdx][i0][j0].first;
             closestCityIdx = cityIdx;
          }
       }
-      for (int pathIdx = 0; pathIdx < 2; ++pathIdx) { //TODO nb_paths()
+      for (int pathIdx = 0; pathIdx < nb_paths(); ++pathIdx) { //TODO nb_paths()
          if (lowestPathCost > paths[pathIdx][i0][j0].first and path_owner(pathIdx) != me()) {
             lowestPathCost = paths[pathIdx][i0][j0].first;
             closestPathIdx = pathIdx;
@@ -172,6 +172,7 @@
     */
     virtual void play () {
       //cout << "ROUND = " << round() << endl;
+      //cout << ">>>>>>>>>CPU LAST ROUND: " << status(3) << endl;
       if (round() == 0) {
         //cout << "ENTERED THE ROUND 0 IF" << endl;
         cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1))));
@@ -180,8 +181,8 @@
         //cout << "paths[0][1][1].first = " << paths[0][1][1].first << endl;
         VP posCities = VP(nb_cities(), PII(-1, -1));
         VP posPaths = VP(nb_paths(), PII(-1, -1));
-        cout << "nb_cities = " << nb_cities() << endl;
-        cout << "nb_paths = " << nb_paths() << endl;
+        //cout << "nb_cities = " << nb_cities() << endl;
+        //cout << "nb_paths = " << nb_paths() << endl;
 
         for(int i = 0; i < rows(); ++i) {
           for (int j = 0; j < cols(); ++j) {
@@ -203,17 +204,18 @@
             }
           }
         }
-
-        for (int k = 0; k < nb_cities(); ++k) {
+        /*
+        for (int k = 0; k < nb_paths(); ++k) {
           for (int i = 0; i < rows(); ++i) {
             for (int j = 0; j < cols(); ++j) {
-              if (cities[k][i][j].second != -1) cout << ' ' << dir_str[cities[k][i][j].second];
+              if (paths[k][i][j].second != -1) cout << ' ' << dir_str[paths[k][i][j].second];
               else cout << " -";
             }
             cout << endl;
           }
           cout << endl << endl;
-        }
+        } */
+
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
 
@@ -222,6 +224,7 @@
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
       //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
+      cout << "selectedProfitableObject = " << selectedProfitableObject << endl;
       if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
          move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
     }
