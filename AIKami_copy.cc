@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Kami2
+#define PLAYER_NAME Camelia
 
 
 /**
@@ -147,16 +147,16 @@
        if (d == paths[k][x.i][x.j].first) {
          //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
-           cout << "direcció: " << dir << endl;
+           //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
              int c = 2*cost (cell(y).type); //cost de la nova posició
              int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << paths[k][y.i][y.j] << endl;
-             cout << "d2 = " << d2 << endl;
-             cout << "paths[k][y.i][y.j].first = " << paths[k][y.i][y.j].first << endl;
+             //cout << "d2 = " << d2 << endl;
+             //cout << "paths[k][y.i][y.j].first = " << paths[k][y.i][y.j].first << endl;
              if (d2 < paths[k][y.i][y.j].first) {
-               cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
+               //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
                paths[k][y.i][y.j].first = d2;
                Q.push(P(-d2, y));
                paths[k][y.i][y.j].second = dir_contraria[dir];
@@ -175,7 +175,7 @@
         cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1))));
         paths = VVVP(nb_paths(), VVP(rows(), VP(cols(), PII(INF, -1))));
 
-        cout << "paths[0][1][1].first = " << paths[0][1][1].first << endl;
+        //cout << "paths[0][1][1].first = " << paths[0][1][1].first << endl;
 
         for (int k = 0; k < nb_cities(); ++k) {
           bool found = false;
@@ -220,7 +220,8 @@
           p.j = j0;
           dijkstraP(p, k); //TODO param wether is a city or a path
         }
-        cout << "INF = " << INF << endl;
+        /*
+        //cout << "INF = " << INF << endl;
         for(int k = 0; k < nb_paths(); ++k) {
           for (int i = 0; i < rows(); ++i) {
             for (int j = 0; j < cols(); ++j) {
@@ -231,6 +232,7 @@
           }
           cout << endl << endl;
         }
+        */
 
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
