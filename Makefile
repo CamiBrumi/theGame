@@ -10,13 +10,8 @@ DUMMY_OBJ = AIDummy.o.Linux64
 EXTRA_OBJ =
 
 # Configuration
-<<<<<<< HEAD
 OPTIMIZE = 0 # Optimization level    (0 to 3)
 DEBUG    = 1 # Compile for debugging (0 or 1)
-=======
-OPTIMIZE = 0 # Optimization level    (0 to 3) //2
-DEBUG    = 1 # Compile for debugging (0 or 1) //0
->>>>>>> 21e875c5cc5a2979452160014c940f8747258f21
 PROFILE  = 0 # Compile for profile   (0 or 1)
 
 

@@ -117,8 +117,8 @@
            //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
-             int c = cost (cell(y).type); //cost de la nova posició
-             int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
+             int c = 2*cost (cell(y).type); //cost de la nova posició
+             int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
              if (d2 < cities[k][y.i][y.j].first) {
                //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
@@ -150,8 +150,8 @@
            //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
-             int c = cost (cell(y).type); //cost de la nova posició
-             int d2 = d + c;//nou cost, segons si és herba, desert, bosc, ...
+             int c = 2*cost (cell(y).type); //cost de la nova posició
+             int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
              if (d2 < paths[k][x.i][x.j].first) {
                //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
