@@ -91,13 +91,19 @@
      Unit u = unit(id);
      Pos posActual = u.pos;
      Dir dir;
+     int dirIdx;
      if (profitableIsCity)
-       dir = Dir(cities[selectedProfitableObject][posActual.i][posActual.j].second);
+       dirIdx = cities[selectedProfitableObject][posActual.i][posActual.j].second;
      else
-       dir = Dir(paths[selectedProfitableObject][posActual.i][posActual.j].second);
+       dirIdx = paths[selectedProfitableObject][posActual.i][posActual.j].second;
+       //dir = Dir(paths[selectedProfitableObject][posActual.i][posActual.j].second);
+     if (dirIdx != -1)
+      dir = Dir(dirIdx);
+     else
+      dir = Dir(NONE);
      //Pos npos = posActual + dir;
      execute(Command(id, dir));
-     cout << dir_str[dir] << endl;
+     //cout << dir_str[dir] << endl;
    }
 
    void dijkstraC(Pos ini, int k) {
@@ -232,7 +238,7 @@
       int selectedProfitableObject;
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
-      cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
+      //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
       if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
          move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
     }
