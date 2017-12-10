@@ -63,13 +63,13 @@
       Pos posActual = u.pos;
       int i0 = posActual.i;
       int j0 = posActual.j;
-      for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {
+      for (int cityIdx = 0; cityIdx < 0; ++cityIdx) { //TODO nb_cities()
          if (lowestCityCost > cities[cityIdx][i0][j0].first and city_owner(cityIdx) != me()) {
             lowestCityCost = cities[cityIdx][i0][j0].first;
             closestCityIdx = cityIdx;
          }
       }
-      for (int pathIdx = 0; pathIdx < nb_paths(); ++pathIdx) {
+      for (int pathIdx = 0; pathIdx < 2; ++pathIdx) { //TODO nb_paths()
          if (lowestPathCost > paths[pathIdx][i0][j0].first and path_owner(pathIdx) != me()) {
             lowestPathCost = paths[pathIdx][i0][j0].first;
             closestPathIdx = pathIdx;
@@ -171,69 +171,49 @@
     * Play method, invoked once per each round.
     */
     virtual void play () {
+      //cout << "ROUND = " << round() << endl;
       if (round() == 0) {
+        //cout << "ENTERED THE ROUND 0 IF" << endl;
         cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1))));
         paths = VVVP(nb_paths(), VVP(rows(), VP(cols(), PII(INF, -1))));
 
         //cout << "paths[0][1][1].first = " << paths[0][1][1].first << endl;
+        VP posCities = VP(nb_cities(), PII(-1, -1));
+        VP posPaths = VP(nb_paths(), PII(-1, -1));
+        cout << "nb_cities = " << nb_cities() << endl;
+        cout << "nb_paths = " << nb_paths() << endl;
+
+        for(int i = 0; i < rows(); ++i) {
+          for (int j = 0; j < cols(); ++j) {
+
+            if (cell(i,j).city_id != -1 and posCities[cell(i,j).city_id].first == -1) {
+              int k = cell(i,j).city_id;
+              Pos p;
+              p.i = posCities[k].first = i;
+              p.j = posCities[k].second = j;
+              cities[k][i][j].first = 0;
+              dijkstraC(p, k);
+            } else if (cell(i,j).path_id != -1 and posPaths[cell(i,j).path_id].first == -1) {
+              int k = cell(i,j).path_id;
+              Pos p;
+              p.i = posPaths[k].first = i;
+              p.j = posPaths[k].second = j;
+              paths[k][i][j].first = 0;
+              dijkstraP(p, k);
+            }
+          }
+        }
 
         for (int k = 0; k < nb_cities(); ++k) {
-          bool found = false;
-          int i0, j0;
-          //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
-          for (int i = 0; i < rows() and not found; ++i) {
-            for (int j = 0; j < cols() and not found; ++j) {
-              if (cell(i, j).city_id == k) {
-                i0 = i;
-                j0 = j;
-                found = true;
-              }
-
-            }
-
-          }
-          cities[k][i0][j0].first = 0;
-          Pos p;
-          p.i = i0;
-          p.j = j0;
-          dijkstraC(p, k); //TODO param wether is a city or a path
-
-        }
-        for (int k = 0; k < nb_paths(); ++k) {
-          bool found = false;
-          int i0, j0;
-          //path0 = VVP(rows(), VP(cols(), PII(INF, -1))); // a cada posició de la matriu hi ha un pair de cost i direcció
-          for (int i = 0; i < rows() and not found; ++i) {
-            for (int j = 0; j < cols() and not found; ++j) {
-              if (cell(i, j).path_id == k) {
-                i0 = i;
-                j0 = j;
-                found = true;
-              }
-
-            }
-
-          }
-          paths[k][i0][j0].first = 0;
-          Pos p;
-          p.i = i0;
-          p.j = j0;
-          dijkstraP(p, k); //TODO param wether is a city or a path
-        }
-        /*
-        //cout << "INF = " << INF << endl;
-        for(int k = 0; k < nb_paths(); ++k) {
           for (int i = 0; i < rows(); ++i) {
             for (int j = 0; j < cols(); ++j) {
-              if (paths[k][i][j].first < INF) cout << " " << paths[k][i][j].first;
+              if (cities[k][i][j].second != -1) cout << ' ' << dir_str[cities[k][i][j].second];
               else cout << " -";
             }
             cout << endl;
           }
           cout << endl << endl;
         }
-        */
-
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
 
