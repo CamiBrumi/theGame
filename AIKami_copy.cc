@@ -95,8 +95,12 @@
        dir = Dir(cities[selectedProfitableObject][posActual.i][posActual.j].second);
      else
        dir = Dir(paths[selectedProfitableObject][posActual.i][posActual.j].second);
-     //Pos npos = posActual + dir;
-     execute(Command(id, dir));
+
+    //mirem si hi ha un altre ork que no és meu en la cel.la on em vull moure.
+     Pos npos = posActual + dir;
+     int nearbyUnitId = cell(npos).unit_id;
+     if (nearbyUnitId != -1 and nearbyUnitId != me() and unit(nearbyUnitId).health > u.health) else{}  // TODO
+     else execute(Command(id, dir));
      //cout << dir_str[dir] << endl;
    }
 
