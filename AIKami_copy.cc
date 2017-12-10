@@ -216,14 +216,15 @@
           p.j = j0;
           dijkstraP(p, k); //TODO param wether is a city or a path
         }
-
-        //for (int i = 0; i < rows(); ++i) {
-        //  for (int j = 0; j < cols(); ++j) {
-        //    if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
-        //    else cout << " -";
-        //  }
-        //  cout << endl;
-        //}
+        /*
+        for (int i = 0; i < rows(); ++i) {
+          for (int j = 0; j < cols(); ++j) {
+            if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
+            else cout << " -";
+          }
+          cout << endl;
+        }
+        */
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
 
