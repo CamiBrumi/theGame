@@ -44,6 +44,7 @@
 
    const int dir_contraria [4] = { 2, 3, 0, 1 };
    const char dir_str [4] = { 'B', 'R', 'T', 'L' };
+   const int COST_MULTIPLIER = 5;
 
    // Returns true if winning.
    bool winning() {
@@ -125,7 +126,7 @@
            //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
-             int c = 2*cost (cell(y).type); //cost de la nova posició
+             int c = COST_MULTIPLIER*cost (cell(y).type); //cost de la nova posició
              int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
              if (d2 < cities[k][y.i][y.j].first) {
@@ -158,7 +159,7 @@
            //cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
-             int c = 2*cost (cell(y).type); //cost de la nova posició
+             int c = COST_MULTIPLIER*cost (cell(y).type); //cost de la nova posició
              int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
              //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << paths[k][y.i][y.j] << endl;
              //cout << "d2 = " << d2 << endl;
@@ -233,7 +234,7 @@
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
       //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
-      cout << "selectedProfitableObject = " << selectedProfitableObject << endl;
+      //cout << "selectedProfitableObject = " << selectedProfitableObject << endl;
       if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
          move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
     }
