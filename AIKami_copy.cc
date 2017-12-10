@@ -193,7 +193,11 @@
      /**
       * Given constructor.
       */
-     pdd (Pos posicio, int direccio, int distancia);
+     pdd (Pos posicio, int direccio, int distancia) {
+       pos = posicio;
+       dir = direccio;
+       dist = distancia;
+     }
 
    };
    //primul if din while
@@ -225,7 +229,7 @@
      int xDir = NONE;
      int xDist = -1;
      while (not cua.empty()) {
-      pdd posDirDist = cua.front(); cua.pop();
+      //pdd posDirDist = cua.front(); cua.pop();
       Pos x = cua.front().pos;
       xDir = cua.front().dir;
       xDist = cua.front().dist;
@@ -249,7 +253,7 @@
            posicionsVisitades.insert(y);
            //cuaPos.push(y);
            //cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
-           cua.push(pdd(y, xDir, xDist + 1);
+           cua.push(pdd(y, xDir, xDist + 1));
         }
       }
     }
