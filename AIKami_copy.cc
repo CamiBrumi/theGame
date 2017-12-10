@@ -38,7 +38,7 @@
    typedef pair<int, int> PII;
    typedef vector<PII> VP;
    typedef vector<VP>  VVP;
-   VVP path0; //TODO delete this after used
+   //VVP path0; //TODO delete this after used
    typedef vector<VVP> VVVP; //vector de matrius de pairs.
    VVVP cities, paths;
 
@@ -53,11 +53,48 @@
      return true;
    }
 
+   //the closest profitable is considered only if it is not yours 
+   void getClosestProfitableObject(int id, int &selectedProfitableObject, bool &profitableIsCity) {
+      int closestCityIdx, closestPathIdx;
+      int lowestCityCost, lowestPathCost;
+      closestCityIdx = closestPathIdx = -1;
+      lowestCityCost = lowestPathCost = 99999999; //replace this cost with a maximum constant
+      Unit u = unit(id);
+      Pos posActual = u.pos;
+      int i0 = posActual.i; 
+      int j0 = posActual.j;
+      for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {
+         if (lowestCityCost > cities[cityIdx][i0][j0].first and city_owner(cityIdx) != me()) {
+            lowestCityCost = cities[cityIdx][i0][j0].first;
+            closestCityIdx = cityIdx;
+         }
+      }
+      for (int pathIdx = 0; pathIdx < nb_paths(); ++pathIdx) {
+         if (lowestPathCost > paths[pathIdx][i0][j0].first and path_owner(pathIdx) != me()) {
+            lowestPathCost = paths[pathIdx][i0][j0].first;
+            closestPathIdx = pathIdx;
+         }
+      }
+      if (lowestPathCost < lowestCityCost) {
+         selectedProfitableObject = closestPathIdx;
+         profitableIsCity = false;
+      } else {
+         selectedProfitableObject = closestCityIdx;
+         profitableIsCity = true;
+      }
+   }
+
    // Moves ork with identifier id.
-   void move(int id) {
+   //if profitableIsCity is false, then it means that the paths VVVP must be used
+   //selectedProfitableObject is the index of the city or path to be used
+   void move(int id, int selectedProfitableObject, bool profitableIsCity) {
      Unit u = unit(id);
      Pos posActual = u.pos;
-     Dir dir = Dir(path0[posActual.i][posActual.j].second);
+     Dir dir;
+     if (profitableIsCity)
+       dir = Dir(cities[selectedProfitableObject][posActual.i][posActual.j].second);
+     else
+       dir = Dir(paths[selectedProfitableObject][posActual.i][posActual.j].second);
      //Pos npos = posActual + dir;
      execute(Command(id, dir));
      cout << dir_str[dir] << endl;
@@ -180,19 +217,23 @@
           dijkstraP(p, k); //TODO param wether is a city or a path
         }
 
-        for (int i = 0; i < rows(); ++i) {
-          for (int j = 0; j < cols(); ++j) {
-            if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
-            else cout << " -";
-          }
-          cout << endl;
-        }
+        //for (int i = 0; i < rows(); ++i) {
+        //  for (int j = 0; j < cols(); ++j) {
+        //    if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
+        //    else cout << " -";
+        //  }
+        //  cout << endl;
+        //}
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
 
     for (int k = 0; k < int(my_orks.size()); ++k) {
-      cout << "ORK " << k << " IS MOVING IN DIRECTION: ";
-      move(my_orks[k]);
+      int selectedProfitableObject;
+      bool profitableIsCity;
+      getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
+      cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
+      if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
+         move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
     }
   }
 
