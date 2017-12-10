@@ -53,7 +53,7 @@
      return true;
    }
 
-   //the closest profitable is considered only if it is not yours 
+   //the closest profitable is considered only if it is not yours
    void getClosestProfitableObject(int id, int &selectedProfitableObject, bool &profitableIsCity) {
       int closestCityIdx, closestPathIdx;
       int lowestCityCost, lowestPathCost;
@@ -61,7 +61,7 @@
       lowestCityCost = lowestPathCost = 99999999; //replace this cost with a maximum constant
       Unit u = unit(id);
       Pos posActual = u.pos;
-      int i0 = posActual.i; 
+      int i0 = posActual.i;
       int j0 = posActual.j;
       for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {
          if (lowestCityCost > cities[cityIdx][i0][j0].first and city_owner(cityIdx) != me()) {
@@ -153,17 +153,19 @@
        if (d == paths[k][x.i][x.j].first) {
          //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
-           //cout << "direcció: " << dir << endl;
+           cout << "direcció: " << dir << endl;
            Pos y = x + Dir(dir); //posició del veí segons la direcció escollida
            if (pos_ok(y) and cell(y).type != WATER) {
              int c = 2*cost (cell(y).type); //cost de la nova posició
              int d2 = d + c + 1;//nou cost, segons si és herba, desert, bosc, ...
-             //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << path0[y.i][y.j] << endl;
-             if (d2 < paths[k][x.i][x.j].first) {
-               //cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
-               paths[k][x.i][x.j].first = d2;
+             //cout << "d2 = " << d2 << " , path0[y.i][y.j] = " << paths[k][y.i][y.j] << endl;
+             cout << "d2 = " << d2 << endl;
+             cout << "paths[k][y.i][y.j].first = " << paths[k][y.i][y.j].first << endl;
+             if (d2 < paths[k][y.i][y.j].first) {
+               cout << "HA ENTRAT EN EL if (d2 < path0[x.i][x.j]) => S'HAURIA DE MODIFICAR LA MATRIU EN EL PUNT " << x.i << " " << x.j << endl;
+               paths[k][y.i][y.j].first = d2;
                Q.push(P(-d2, y));
-               paths[k][x.i][x.j].second = dir_contraria[dir];
+               paths[k][y.i][y.j].second = dir_contraria[dir];
              }
            }
          }
@@ -178,6 +180,8 @@
       if (round() == 0) {
         cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1))));
         paths = VVVP(nb_paths(), VVP(rows(), VP(cols(), PII(INF, -1))));
+
+        cout << "paths[0][1][1].first = " << paths[0][1][1].first << endl;
 
         for (int k = 0; k < nb_cities(); ++k) {
           bool found = false;
@@ -222,15 +226,18 @@
           p.j = j0;
           dijkstraP(p, k); //TODO param wether is a city or a path
         }
-        /*
-        for (int i = 0; i < rows(); ++i) {
-          for (int j = 0; j < cols(); ++j) {
-            if (path0[i][j].second != -1) cout << " " << dir_str[path0[i][j].second];
-            else cout << " -";
+        cout << "INF = " << INF << endl;
+        for(int k = 0; k < nb_paths(); ++k) {
+          for (int i = 0; i < rows(); ++i) {
+            for (int j = 0; j < cols(); ++j) {
+              if (paths[k][i][j].first < INF) cout << " " << paths[k][i][j].first;
+              else cout << " -";
+            }
+            cout << endl;
           }
-          cout << endl;
+          cout << endl << endl;
         }
-        */
+
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
 
