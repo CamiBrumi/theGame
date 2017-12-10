@@ -245,6 +245,16 @@
       int selectedProfitableObject;
       bool profitableIsCity;
       getClosestProfitableObject(my_orks[k], selectedProfitableObject, profitableIsCity);
+      
+      int ork_i = unit(my_orks[k]).pos.first;
+      int ork_j = unit(my_orks[k]).pos.second;
+
+      bool attackedOrDefended = false;
+      if (Cell(ork_i, ork_j).type == CITY or Cell(ork_i, ork_j).type == PATH) {
+         const int radius = 5;
+         findEnemyInNearbyCell(cell)
+      }
+       
       //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
       if (selectedProfitableObject != -1) //it might happen that you have simply conquered all
          move(my_orks[k], selectedProfitableObject, profitableIsCity); //the cities and paths
