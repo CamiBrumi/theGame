@@ -262,7 +262,7 @@
          Dir dir = Dir(d);
          Pos y = x + dir;
          //cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
-         if ((pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) and (cell(x).type == CITY or cell(x).type == PATH)) { //no hem visitat aquesta casella
+         if ((pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) and (cell(y).type == CITY or cell(y).type == PATH)) { //no hem visitat aquesta casella
 
            posicionsVisitades.insert(y);
            //cuaPos.push(y);
