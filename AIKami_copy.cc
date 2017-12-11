@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Camelia
+#define PLAYER_NAME Kami
 
 
 /**
@@ -219,7 +219,7 @@
        int dist = 1;
        posicionsVisitades.insert(novaPos);
 
-       if (pos_ok(novaPos)) {
+       if (pos_ok(novaPos) and (cell(novaPos).type == CITY or cell(novaPos).type == PATH)) {
          //cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
          cua.push(pdd(novaPos, d, dist));
          //cuaPos.push(novaPos);
@@ -240,7 +240,21 @@
           if (unit(cell(x).unit_id).health < unit(cell(posActual).unit_id).health) {
             execute(Command(cell(posActual).unit_id, Dir(xDir)));
           } else {
-            execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
+            Pos pContraria = posActual + Dir(dir_contraria[xDir]);
+            if (cell(pContraria).type == CITY or cell(pContraria).type == PATH) {
+              execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
+            } else {
+              bool dirFound = false;
+              for (int k = 0; k < DIR_SIZE and not dirFound; ++k) {
+                  if (k != dir_contraria[xDir] and k != xDir) {
+                    if (cell(posActual + Dir(k)).type == CITY or cell(posActual + Dir(k)).type == PATH) {
+                      execute(Command(cell(posActual).unit_id, Dir(k)));
+                      dirFound = true;
+                    }
+                  }
+              }
+            }
+
           }
           return true;
         }
