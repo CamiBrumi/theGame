@@ -1,0 +1,9 @@
+- trebuie sa folosesti -g când compilezi si sa nu pui flag-uri de optimizare ca si -O3 sau -O2
+- când executi cu gdb faci:
+    gdb --args ./numeProgram argumenteProgram
+    în timp ce debuggezi faci "run" ca sa executi programul
+    faci "bt" ca sa-ti arate în ce functie esti si care sunt functiile care te-au adus unde esti
+    faci "frame <numar>" ca sa te situezi inlauntru unei functii pe care o debuggezi
+    <numar> îl obtii când faci bt
+    cu print <valoare> poti obtine informatie despre starea variabilelor când ai facut segfault
+    <valoare> poate fi si rezultatul unei functii ca si vectorulMeu.size()
