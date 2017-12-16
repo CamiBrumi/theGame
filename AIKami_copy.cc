@@ -219,7 +219,7 @@
        int dist = 1;
        posicionsVisitades.insert(novaPos);
 
-       if (pos_ok(novaPos) and (cell(novaPos).type != WATER)) {
+       if (pos_ok(novaPos) and (cell(novaPos).type == CITY or cell(novaPos).type == PATH)) {
          //cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
          cua.push(pdd(novaPos, d, dist));
          //cuaPos.push(novaPos);
@@ -236,19 +236,16 @@
       cua.pop();
       //cout << "Dir poped is " << xDir << endl;
       if (cell(x).unit_id != -1 and unit(cell(x).unit_id).player != me()) {
-
          //cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
-          if ((unit(cell(x).unit_id).health < unit(cell(posActual).unit_id).health) and (cell(x).type == CITY or cell(x).type == PATH)) {
+          if (unit(cell(x).unit_id).health < unit(cell(posActual).unit_id).health) {
             execute(Command(cell(posActual).unit_id, Dir(xDir)));
-
-          } else if ((unit(cell(x).unit_id).health > unit(cell(posActual).unit_id).health) and xDist <= 4){ //incearca si cu doi // DE ASEMENEA; CALCULEAZA VIATA CU CARE O SA AJUNGA LA TINE
+          } else {
             Pos pContraria = posActual + Dir(dir_contraria[xDir]);
             if (cell(pContraria).type == CITY or cell(pContraria).type == PATH) {
               execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
-
             } else {
               bool dirFound = false;
-              for (int k = 0; k < DIR_SIZE and not dirFound; ++k) { //Am pus doar pana la NONE, nu inclus, fiindca daca enemigo ii afara din cetate si e la o distanta de 2, prefer ca jucatorul meu sa continue sa lucreze
+              for (int k = 0; k < DIR_SIZE and not dirFound; ++k) {
                   if (k != dir_contraria[xDir] and k != xDir) {
                     if (cell(posActual + Dir(k)).type == CITY or cell(posActual + Dir(k)).type == PATH) {
                       execute(Command(cell(posActual).unit_id, Dir(k)));
