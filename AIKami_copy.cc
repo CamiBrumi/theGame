@@ -200,6 +200,27 @@
      }
 
    };
+
+   //ideeas: look more positions away.
+   //take into accound the position of the enemy
+   //take into account the direction you wanted to take.
+   void moveAwayFromEnemy(Pos posActual, int xDir) {
+
+     Pos pContraria = posActual + Dir(dir_contraria[xDir]);
+     if (cell(pContraria).type != WATER) {
+       execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
+     } else {
+       bool dirFound = false;
+       for (int k = 0; k < DIR_SIZE and not dirFound; ++k) {
+         if (k != dir_contraria[xDir] and k != xDir) {
+           if (cell(posActual + Dir(k)).type != WATER) {
+             execute(Command(cell(posActual).unit_id, Dir(k)));
+             dirFound = true;
+           }
+         }
+       }
+     }
+   }
    //primul if din while
    //daca orcul din pos x ii al meu?
   //id != -1 and ii un orc strain
@@ -219,11 +240,8 @@
        int dist = 1;
        posicionsVisitades.insert(novaPos);
 
-       if (pos_ok(novaPos) and (cell(novaPos).type == CITY or cell(novaPos).type == PATH)) {
-         //cout << "Ork initially plans to look at position (" << novaPos.i << ", " << novaPos.j << "), going in the direction of " << d << endl;
+       if (pos_ok(novaPos) and cell(novaPos).type != WATER) {
          cua.push(pdd(novaPos, d, dist));
-         //cuaPos.push(novaPos);
-         //cuaDir.push(d);
        }
      }
      int xDir = NONE;
@@ -239,40 +257,38 @@
          //cout << "Ork found position (" <<  x.i << ", " << x.j <<  ") to be feasible since it contains a city " << (cell(x).type == CITY) << " or a path " << (cell(x).type == PATH) << " and the direction of growth is " << xDir << endl;
           if (unit(cell(x).unit_id).health < unit(cell(posActual).unit_id).health) {
             execute(Command(cell(posActual).unit_id, Dir(xDir)));
-          } else {
-            Pos pContraria = posActual + Dir(dir_contraria[xDir]);
-            if (cell(pContraria).type == CITY or cell(pContraria).type == PATH) {
-              execute(Command(cell(posActual).unit_id, Dir(dir_contraria[xDir])));
-            } else {
-              bool dirFound = false;
-              for (int k = 0; k < DIR_SIZE and not dirFound; ++k) {
-                  if (k != dir_contraria[xDir] and k != xDir) {
-                    if (cell(posActual + Dir(k)).type == CITY or cell(posActual + Dir(k)).type == PATH) {
-                      execute(Command(cell(posActual).unit_id, Dir(k)));
-                      dirFound = true;
-                    }
-                  }
-              }
-            }
-
-          }
+          } else if (xDist < 3)
+            moveAwayFromEnemy(posActual, xDir); //you should then improve the algorithm to take into account the posContraria
+                                            //and then the going direction of the ork
           return true;
         }
-       for (int d = 0; d < 4 and xDist < 5; ++d) {
-         Dir dir = Dir(d);
-         Pos y = x + dir;
-         //cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
-         if ((pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) and (cell(y).type == CITY or cell(y).type == PATH)) { //no hem visitat aquesta casella
+        for (int d = 0; d < 4 and xDist < 5; ++d) {
+          Dir dir = Dir(d);
+          Pos y = x + dir;
+          //cout << "Dir poped is " << xDir << ", old pos " << x <<  "and new pos is " << y <<" which is considered to be pos_ok:" << pos_ok(y) << " and the element has not been visited "  << (posicionsVisitades.find(y) == posicionsVisitades.end()) << endl;
+          if ((pos_ok(y) and posicionsVisitades.find(y) == posicionsVisitades.end()) and cell(y).type != WATER) { //no hem visitat aquesta casella
 
-           posicionsVisitades.insert(y);
-           //cuaPos.push(y);
-           //cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
-           cua.push(pdd(y, xDir, xDist + 1));
+            posicionsVisitades.insert(y);
+            //cuaPos.push(y);
+            //cuaDir.push(xDir); // direcció cap a on ens haurem de moure des del vèrtex inicial
+            cua.push(pdd(y, xDir, xDist + 1));
+          }
         }
       }
+      return false;
     }
-     return false;
-  }
+
+      /*
+      for (int k = 0; k < nb_paths(); ++k) {
+        for (int i = 0; i < rows(); ++i) {
+          for (int j = 0; j < cols(); ++j) {
+            if (paths[k][i][j].second != -1) cout << ' ' << dir_str[paths[k][i][j].second];
+            else cout << " -";
+          }
+          cout << endl;
+        }
+        cout << endl << endl;
+      } */
 
 
    /**
@@ -312,17 +328,6 @@
             }
           }
         }
-        /*
-        for (int k = 0; k < nb_paths(); ++k) {
-          for (int i = 0; i < rows(); ++i) {
-            for (int j = 0; j < cols(); ++j) {
-              if (paths[k][i][j].second != -1) cout << ' ' << dir_str[paths[k][i][j].second];
-              else cout << " -";
-            }
-            cout << endl;
-          }
-          cout << endl << endl;
-        } */
 
     }
     VI my_orks = orks(me()); // Get the id's of my orks.
@@ -340,10 +345,10 @@
       p.j = ork_j;
 
       bool threatened = false;
-      if (cell(ork_i, ork_j).type == CITY or cell(ork_i, ork_j).type == PATH) {
-         const int radius = 5;
-         threatened = findEnemyInNearbyCell(p); // inauntru punem radius si miscam jucatorul inspre enemic
-      }
+      //if (cell(ork_i, ork_j).type == CITY or cell(ork_i, ork_j).type == PATH) {
+      const int radius = 5;
+      threatened = findEnemyInNearbyCell(p); // inauntru punem radius si miscam jucatorul inspre enemic
+      //}
 
       //cout << "ORK " << k << " with position " <<  " IS MOVING IN DIRECTION: ";
       //cout << "selectedProfitableObject = " << selectedProfitableObject << endl;
