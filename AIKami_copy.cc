@@ -109,7 +109,7 @@
 
    }
 
-   void dijkstraC(Pos ini, int k, VVI& cellCost) {
+   void dijkstraC(Pos ini, int k, VVI& cellCost, Pos fini) {
      //cout << "HELLOU" << endl;
      priority_queue<P> Q;
      //VE dist(n, INF);
@@ -120,6 +120,8 @@
        P a = Q.top(); Q.pop();
        int d = -a.first;
        Pos x = a.second;
+       if (x == fini)
+         return;
        if (d == cities[k][x.i][x.j].first) {
          //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
@@ -144,7 +146,7 @@
      //for (int x = 0; x < n; ++x) cout << x << ' ' << dist[x] << endl;
    }
 
-   void dijkstraP(Pos ini, int k, VVI& cellCost) {
+   void dijkstraP(Pos ini, int k, VVI& cellCost, Pos fini) {
      //cout << "HELLOU" << endl;
      priority_queue<P> Q;
      //VE dist(n, INF);
@@ -155,6 +157,8 @@
        P a = Q.top(); Q.pop();
        int d = -a.first;
        Pos x = a.second;
+       if (x == fini)
+         return;
        if (d == paths[k][x.i][x.j].first) {
          //cout << "ESTEM EN EL PAS if (d == path0[x.i][x.j])" << endl;
          for (int dir = 0; dir != 4; ++dir) { //per a cada direcció / veí
@@ -348,36 +352,55 @@
              int iAwayFromCenter = abs(protectionRadius - (i - iUpper));
              int jAwayFromCenter = abs(protectionRadius - (j - jLeft));
              if (iAwayFromCenter + jAwayFromCenter <= protectionRadius) {
-                cellCost[i][j] = 1000 - (iAwayFromCenter + jAwayFromCenter);
+                cellCost[i][j] = 1000000 - (iAwayFromCenter + jAwayFromCenter);
 //                cout << "Drawing big cell cost" << endl;
              }
           }
        }
     }
 
-    const int numCitiesForDijk = 2;
+    const int numCitiesForDijk = 5;
     const int numPathsForDijk = 2;
 
 
-    //void getNearCityAndVilages(VI &vecForeignNearCities, VI &vecForeignNearPaths, Pos posActual){
-    //  int numCities = min(numCitiesForDijk, nb_cities());
-    //  vector<int> nearestCitiesIdx(numCities, -1);
-    //  vector<int> nearestCitiesDist(numCities, INF);
-    //  for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {//if this is too costly just restrict it to
-    //    if (city_owner(cityIdx) != me()) {
-    //      City destinyCity = city(cityIdx);
-    //      for (int cityPosIdx = 0; cityPosIdx < destinyCity.size(); ++cityPosIdx){
-    //        Pos cityPos = destinyCity[cityPosIdx];
-    //        int distToCell = abs(cityPos.i - posActual.i) + abs(cityPos.j - posActual.j);
-    //        for (nearestCities_i = 0; nearestCities_i < numCities; ++nearestCities_i)
-    //          if (distToCell < nearestCitiesDist[nearestCities_i]) {
-    //            nearestCitiesDist[nearestCities_i] = distToCell;
-    //            nearestCitieIdx[nearestCities_i]
-    //          }
-    //      }
-    //    }
-    //  }
-    //}
+    void getNearCityAndVilages(priority_queue<pair<int, int> > &nearestCities, priority_queue<pair<int, int> > &nearestPaths, Pos posActual){
+      int numCities = min(numCitiesForDijk, nb_cities());
+//      priority_queue<pair<int, int> > nearestCitiesIdx(numCities, -1);
+      //first is distance and second is idx
+      for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {//if this is too costly just restrict it to
+        if (city_owner(cityIdx) != me()) {
+          City destinyCity = city(cityIdx);
+          int minDist = INF;
+          for (int cityPosIdx = 0; cityPosIdx < destinyCity.size(); ++cityPosIdx){
+            Pos cityPos = destinyCity[cityPosIdx];
+            int distToCell = abs(cityPos.i - posActual.i) + abs(cityPos.j - posActual.j);
+            if (minDist > distToCell)
+               minDist = distToCell;
+          }
+          nearestCities.push(pair<int, int>(minDist, cityIdx));
+          if (nearestCities.size() > numCitiesForDijk)
+            nearestCities.pop();
+        }
+      }
+
+      int numPaths = min(numPathsForDijk, nb_paths());
+
+      for (int pathIdx = 0; pathIdx < nb_paths(); ++pathIdx) {//if this is too costly just restrict it to
+        if (path_owner(pathIdx) != me()) {
+          vector<Pos> destinyPath = path(pathIdx).second;
+          int minDist = INF;
+          for (int pathPosIdx = 0; pathPosIdx < destinyPath.size(); ++pathPosIdx){
+            Pos pathPos = destinyPath[pathPosIdx];
+            int distToCell = abs(pathPos.i - posActual.i) + abs(pathPos.j - posActual.j);
+            if (minDist > distToCell)
+               minDist = distToCell;
+          }
+          nearestPaths.push(pair<int, int>(minDist, pathIdx));
+          if (nearestPaths.size() > numPathsForDijk)
+             nearestPaths.pop();
+        }
+      }
+    }
     void ork_action(int orkid) {
       VVI cellCost = VVI(rows(), VI(cols(), 1)); 
       cities = VVVP(nb_cities(), VVP(rows(), VP(cols(), PII(INF, -1)))); //those will contain the  
@@ -413,10 +436,14 @@
         }
       //}
       //heuristic to decrease amount of looked up cities and paths
-      //Unit u = unit(orkid);
-      //Pos posActual = u.pos;
+      Unit u = unit(orkid);
+      Pos posActual = u.pos;
       //getNearCitiesAndVilages(vecForeignNearCities, vecForeignNearPaths, posActual);
-      for (int cityIdx = 0; cityIdx < nb_cities(); ++cityIdx) {//if this is too costly just restrict it to
+      priority_queue<pair<int, int> > nearestCities, nearestPaths;
+      getNearCityAndVilages(nearestCities, nearestPaths, posActual);
+      while (nearestCities.size() != 0) {//if this is too costly just restrict it to
+        int cityIdx = nearestCities.top().second;
+        nearestCities.pop();
                                                                //the closest cities and paths
         if (city_owner(cityIdx) != me()) {
           Pos samplePos = Pos(-1, -1);
@@ -432,14 +459,15 @@
           cities[cityIdx][posOfMinCost.i][posOfMinCost.j].first = 0;
           
           if (posOfMinCost.i != -1) //you can put a warning here
-            dijkstraC(posOfMinCost, cityIdx, cellCost);
+            dijkstraC(posOfMinCost, cityIdx, cellCost, unit(orkid).pos);
           
           //you may also want to consider paths here, but we do not do that for the moment
         }
         
       }
-      for (int pathIdx = 0; pathIdx < nb_paths(); ++pathIdx) {//if this is too costly just restrict it to
-                                                               //the closest cities and paths
+      while (nearestPaths.size() != 0) {//if this is too costly just restrict it to
+        int pathIdx = nearestPaths.top().second;
+        nearestPaths.pop();
         
         if (path_owner(pathIdx) != me()) {
           Pos samplePos = Pos(-1, -1);
@@ -455,7 +483,7 @@
           paths[pathIdx][posOfMinCost.i][posOfMinCost.j].first = 0;
           
           if (posOfMinCost.i != -1) //you can put a warning here
-            dijkstraP(posOfMinCost, pathIdx, cellCost);
+            dijkstraP(posOfMinCost, pathIdx, cellCost, unit(orkid).pos);
           //you may also want to consider paths here, but we do not do that for the moment
         
         }
